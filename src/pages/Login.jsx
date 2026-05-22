@@ -1,20 +1,50 @@
-import { ShieldCheck, Mail, Lock } from "lucide-react";
+import { ShieldCheck, Mail, Lock, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useState } from "react";
+
 const Login = () => {
   const navigate = useNavigate();
 
-  const onSubmitHandle = (e) => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onSubmitHandle = async (e) => {
     e.preventDefault();
-    navigate("/partners");
+
+    setLoading(true);
+    setError("");
+    console.log(email, password);
+
+    try {
+      const res = await axios.post(`${API_URL}/api/login`, {
+        email,
+        password,
+      });
+
+      console.log(res.data);
+
+      navigate("/partners");
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0d9488] to-[#0f172a] flex items-center justify-center px-4">
-      {/* LOGIN CARD */}
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10">
         {/* HEADER */}
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-[#0d9488]/10 rounded-full flex items-center justify-center mx-auto mb-5">
-            <ShieldCheck className="w-10 h-10 text-[#0d9488]" />
+            {/* <ShieldCheck className="w-10 h-10 text-[#0d9488]" /> */}
+            <img src="./logo.png" alt="logo" className=" h-15" />
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-bold text-[#0f172a]">
@@ -25,6 +55,13 @@ const Login = () => {
             Secure login for administrators
           </p>
         </div>
+
+        {/* ERROR MESSAGE */}
+        {error && (
+          <div className="mb-4 bg-red-100 border border-red-300 text-red-600 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
 
         {/* FORM */}
         <form className="space-y-5" onSubmit={onSubmitHandle}>
@@ -41,6 +78,9 @@ const Login = () => {
                 type="email"
                 placeholder="Enter admin email"
                 className="w-full ml-3 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                required
               />
             </div>
           </div>
@@ -58,28 +98,27 @@ const Login = () => {
                 type="password"
                 placeholder="Enter password"
                 className="w-full ml-3 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                required
               />
             </div>
           </div>
 
-          {/* REMEMBER + FORGOT */}
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-              <input type="checkbox" className="accent-[#0d9488] w-4 h-4" />
-              Remember me
-            </label>
-
-            <button type="button" className="text-[#0d9488] hover:underline">
-              Forgot Password?
-            </button>
-          </div>
-
-          {/* LOGIN BUTTON */}
+          {/* BUTTON */}
           <button
             type="submit"
-            className="w-full bg-[#0d9488] hover:bg-[#0b7f75] text-white font-semibold py-3.5 rounded-2xl transition duration-300 shadow-lg"
+            disabled={loading}
+            className="w-full bg-[#0d9488] hover:bg-[#0b7f75] disabled:opacity-70 text-white font-semibold py-3.5 rounded-2xl transition duration-300 shadow-lg flex items-center justify-center gap-2"
           >
-            Secure Login
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              "Secure Login"
+            )}
           </button>
         </form>
 
@@ -93,4 +132,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;
