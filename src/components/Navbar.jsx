@@ -1,18 +1,21 @@
-import { Bell, UserCircle2, Menu, LogOut, ChevronDown } from "lucide-react";
+import { Bell, UserCircle2, Menu, LogOut, ChevronDown, X } from "lucide-react";
 
-export default function Navbar() {
+export default function Navbar({ setSidebarOpen, sidebarOpen }) {
   const handleLogout = () => {
-    // localStorage.removeItem("token");
+    localStorage.removeItem("token");
     window.location.href = "/";
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-[#0d9488]/10 px-4 sm:px-6 lg:px-8 py-4 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-[#0d9488]/10 px-4 sm:px-6 lg:px-8 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         {/* LEFT SIDE */}
         <div className="flex items-center gap-4">
           {/* MOBILE MENU */}
-          <button className="lg:hidden p-2 rounded-xl hover:bg-[#0d9488]/10 transition">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="lg:hidden p-2 rounded-xl hover:bg-[#0d9488]/10 transition"
+          >
             <Menu className="text-[#0d9488]" size={24} />
           </button>
 

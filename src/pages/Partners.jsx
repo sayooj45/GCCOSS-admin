@@ -1,28 +1,29 @@
 import { useState } from "react";
 import { Plus, X, Upload, Pencil, Trash2, Search } from "lucide-react";
-
+import { useAdmin } from "../context/AdminContext";
+import axios from "axios";
 export default function Partners() {
-  const [showModal, setShowModal] = useState(false);
+  const { partners, setPartners, token } = useAdmin();
 
-  const [partners, setPartners] = useState([
-    {
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg",
-      title: "React Technologies",
-      description:
-        "Strategic frontend development partner for enterprise applications.",
-    },
-    {
-      logo: "https://upload.wikimedia.org/wikipedia/commons/6/64/Expressjs.png",
-      title: "Express Solutions",
-      description: "Backend infrastructure and API integration partner.",
-    },
-  ]);
+  const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setloading] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const [formData, setFormData] = useState({
     logo: "",
     title: "",
     description: "",
   });
+
+  const filteredPartners = partners.filter(
+    (partner) =>
+      partner?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner?.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleChange = (e) => {
     setFormData({
@@ -31,18 +32,77 @@ export default function Partners() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setPartners([...partners, formData]);
+    setloading(true);
 
-    setFormData({
-      logo: "",
-      title: "",
-      description: "",
-    });
+    const data = new FormData();
 
-    setShowModal(false);
+    if (formData.logo) {
+      data.append("logo", formData.logo);
+    }
+
+    data.append("title", formData.title);
+    data.append("description", formData.description);
+
+    try {
+      if (editId) {
+        const res = await axios.patch(
+          `${API_URL}/api/partners/update/${editId}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const updatedPartners = partners.map((partner) =>
+          partner._id === editId ? res.data.partner : partner
+        );
+
+        setPartners(updatedPartners);
+      } else {
+        const res = await axios.post(`${API_URL}/api/partners/post`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setPartners([...partners, res.data.partner]);
+      }
+
+      setFormData({
+        logo: "",
+        title: "",
+        description: "",
+      });
+
+      setEditId(null);
+
+      setShowModal(false);
+    } catch (error) {
+      console.log(error.response?.data || error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${API_URL}/api/partners/delete/${deleteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setPartners(partners.filter((partner) => partner._id !== deleteId));
+
+      setDeleteId(null);
+    } catch (error) {
+      console.log(error.response?.data || error);
+    }
   };
 
   return (
@@ -67,13 +127,23 @@ export default function Partners() {
             <input
               type="text"
               placeholder="Search partners..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="ml-3 w-full outline-none bg-transparent text-sm"
             />
           </div>
 
           {/* ADD BUTTON */}
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setEditId(null);
+              setFormData({
+                logo: "",
+                title: "",
+                description: "",
+              });
+              setShowModal(true);
+            }}
             className="flex items-center justify-center gap-2 bg-[#0d9488] hover:bg-[#0b7f75] text-white px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <Plus size={20} />
@@ -96,6 +166,7 @@ export default function Partners() {
         </div>
 
         {/* TABLE */}
+
         <div className="overflow-x-auto hidden md:block">
           <table className="w-full">
             <thead className="bg-[#0d9488]/5">
@@ -119,7 +190,7 @@ export default function Partners() {
             </thead>
 
             <tbody>
-              {partners.map((partner, index) => (
+              {filteredPartners.map((partner, index) => (
                 <tr
                   key={index}
                   className="hidden md:table-row border-b border-gray-100 hover:bg-gray-50 transition"
@@ -150,11 +221,27 @@ export default function Partners() {
 
                   <td className="px-4 sm:px-6 py-5">
                     <div className="flex items-center justify-center gap-3">
-                      <button className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition">
+                      <button
+                        onClick={() => {
+                          setEditId(partner._id);
+
+                          setFormData({
+                            logo: "",
+                            title: partner.title,
+                            description: partner.description,
+                          });
+
+                          setShowModal(true);
+                        }}
+                        className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
+                      >
                         <Pencil size={18} />
                       </button>
 
-                      <button className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition">
+                      <button
+                        onClick={() => setDeleteId(partner._id)}
+                        className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
+                      >
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -166,7 +253,7 @@ export default function Partners() {
         </div>
         {/* MOBILE CARDS */}
         <div className="grid grid-cols-1 gap-4 p-4 md:hidden">
-          {partners.map((partner, index) => (
+          {filteredPartners.map((partner, index) => (
             <div
               key={index}
               className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm"
@@ -194,17 +281,36 @@ export default function Partners() {
 
               {/* ACTIONS */}
               <div className="flex items-center justify-end gap-3 mt-5">
-                <button className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition">
+                <button
+                  onClick={() => {
+                    setEditId(partner._id);
+
+                    setFormData({
+                      logo: "",
+                      title: partner.title,
+                      description: partner.description,
+                    });
+
+                    setShowModal(true);
+                  }}
+                  className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
+                >
                   <Pencil size={18} />
                 </button>
 
-                <button className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition">
+                <button
+                  onClick={() => setDeleteId(partner._id)}
+                  className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
+                >
                   <Trash2 size={18} />
                 </button>
               </div>
             </div>
           ))}
         </div>
+        {filteredPartners.length === 0 && (
+          <div className="p-6 text-center text-gray-500">No partners found</div>
+        )}
       </div>
 
       {/* MODAL */}
@@ -214,7 +320,9 @@ export default function Partners() {
             {/* MODAL HEADER */}
             <div className="bg-gradient-to-r from-[#0d9488] to-[#0b7f75] px-8 py-6 text-white flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold">Add New Partner</h2>
+                <h2 className="text-2xl font-bold">
+                  {editId ? "Edit Partner" : "Add New Partner"}
+                </h2>
 
                 <p className="text-white/80 text-sm mt-1">
                   Fill in the partner information
@@ -222,7 +330,15 @@ export default function Partners() {
               </div>
 
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setEditId(null);
+                  setFormData({
+                    logo: "",
+                    title: "",
+                    description: "",
+                  });
+                }}
                 className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
               >
                 <X size={20} />
@@ -241,13 +357,17 @@ export default function Partners() {
                   <Upload className="text-[#0d9488]" size={20} />
 
                   <input
-                    type="text"
+                    type="file"
                     name="logo"
-                    value={formData.logo}
-                    onChange={handleChange}
-                    placeholder="Paste logo image URL"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        logo: e.target.files[0],
+                      })
+                    }
+                    placeholder="Logo image"
                     className="ml-3 w-full outline-none bg-transparent"
-                    required
+                    required={!editId}
                   />
                 </div>
               </div>
@@ -290,7 +410,15 @@ export default function Partners() {
               <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditId(null);
+                    setFormData({
+                      logo: "",
+                      title: "",
+                      description: "",
+                    });
+                  }}
                   className="px-6 py-3 rounded-2xl border border-gray-200 hover:bg-gray-100 transition font-medium"
                 >
                   Cancel
@@ -300,10 +428,71 @@ export default function Partners() {
                   type="submit"
                   className="bg-[#0d9488] hover:bg-[#0b7f75] text-white px-8 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
                 >
-                  Save Partner
+                  {loading
+                    ? "Processing..."
+                    : editId
+                    ? "Update Partner"
+                    : "Save Partner"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteId && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-[28px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            {/* HEADER */}
+            <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-5 text-white flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">Delete Partner</h2>
+
+                <p className="text-white/80 text-sm mt-1">
+                  This action cannot be undone
+                </p>
+              </div>
+
+              <button
+                onClick={() => setDeleteId(null)}
+                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* BODY */}
+            <div className="p-6">
+              <div className="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 size={34} className="text-red-500" />
+              </div>
+
+              <h3 className="text-xl font-bold text-center text-gray-800 mt-5">
+                Are you sure?
+              </h3>
+
+              <p className="text-gray-500 text-center mt-2 leading-relaxed">
+                Do you really want to delete this partner? This process cannot
+                be undone.
+              </p>
+
+              {/* BUTTONS */}
+              <div className="flex gap-4 mt-8">
+                <button
+                  onClick={() => setDeleteId(null)}
+                  className="flex-1 py-3 rounded-2xl border border-gray-200 hover:bg-gray-100 transition font-medium"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 py-3 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

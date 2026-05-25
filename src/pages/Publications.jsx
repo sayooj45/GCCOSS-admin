@@ -10,23 +10,28 @@ import {
   Trash2,
   Eye,
 } from "lucide-react";
+import { useAdmin } from "../context/AdminContext";
+import axios from "axios";
 
 export default function Publications() {
-  const [showModal, setShowModal] = useState(false);
+  const { token, publications, setPublications, API_URL } = useAdmin();
+  console.log("publications", publications);
 
-  const [publications, setPublications] = useState([
-    {
-      image:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
-      title: "Annual Business Report",
-      description:
-        "Comprehensive report covering annual business growth and market analysis.",
-      pdf: "https://example.com/report.pdf",
-    },
-  ]);
+  const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const filteredPublications = publications.filter(
+    (publication) =>
+      publication?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      publication?.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const [formData, setFormData] = useState({
-    image: "",
+    publicationImage: "",
     title: "",
     description: "",
     pdf: null,
@@ -39,19 +44,100 @@ export default function Publications() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setPublications([...publications, formData]);
+    try {
+      setLoading(true);
 
-    setFormData({
-      image: "",
-      title: "",
-      description: "",
-      pdf: null,
-    });
+      const data = new FormData();
 
-    setShowModal(false);
+      if (formData.publicationImage) {
+        data.append("publicationImage", formData.publicationImage);
+      }
+
+      if (formData.pdf) {
+        data.append("pdf", formData.pdf);
+      }
+
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+
+      if (editId) {
+        const res = await axios.patch(
+          `${API_URL}/api/publications/update/${editId}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setPublications((prev) =>
+          prev.map((item) =>
+            item._id === editId ? res.data.publication : item
+          )
+        );
+        setShowModal(false);
+      } else {
+        const res = await axios.post(`${API_URL}/api/publications/post`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setPublications((prev) => [...prev, res.data.publication]);
+      }
+
+      setFormData({
+        publicationImage: "",
+        title: "",
+        description: "",
+        pdf: null,
+      });
+
+      setEditId(null);
+
+      setShowModal(false);
+    } catch (error) {
+      console.log(error.response?.data || error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const handleDelete = async (id) => {
+  //   try {
+  //     await axios.delete(`${API_URL}/api/publications/delete/${id}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     setPublications((prev) => prev.filter((item) => item._id !== id));
+  //   } catch (error) {
+  //     console.log(error.response?.data || error);
+  //   }
+  // };
+
+  const handleDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      await axios.delete(`${API_URL}/api/publications/delete/${deleteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setPublications((prev) => prev.filter((item) => item._id !== deleteId));
+
+      setDeleteId(null);
+    } catch (error) {
+      console.log(error.response?.data || error);
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   return (
@@ -76,13 +162,26 @@ export default function Publications() {
             <input
               type="text"
               placeholder="Search publications..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="ml-3 w-full outline-none bg-transparent text-sm"
             />
           </div>
 
           {/* ADD BUTTON */}
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setEditId(null);
+
+              setFormData({
+                publicationImage: "",
+                title: "",
+                description: "",
+                pdf: null,
+              });
+
+              setShowModal(true);
+            }}
             className="flex items-center justify-center gap-2 bg-[#0d9488] hover:bg-[#0b7f75] text-white px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <Plus size={20} />
@@ -107,8 +206,8 @@ export default function Publications() {
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="overflow-x-auto hidden lg:block">
-          <table className="w-full min-w-[1200px]">
+        <div className="overflow-x-auto hidden md:block">
+          <table className="w-full ">
             <thead className="bg-[#0d9488]/5">
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
@@ -134,7 +233,7 @@ export default function Publications() {
             </thead>
 
             <tbody>
-              {publications.map((item, index) => (
+              {filteredPublications.map((item, index) => (
                 <tr
                   key={index}
                   className="border-b border-gray-100 hover:bg-gray-50 transition"
@@ -165,11 +264,7 @@ export default function Publications() {
                   {/* PDF */}
                   <td className="px-6 py-5">
                     <a
-                      href={
-                        typeof item.pdf === "string"
-                          ? item.pdf
-                          : URL.createObjectURL(item.pdf)
-                      }
+                      href={item.pdf}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0d9488]/10 text-[#0d9488] hover:bg-[#0d9488] hover:text-white transition"
@@ -182,11 +277,28 @@ export default function Publications() {
                   {/* ACTIONS */}
                   <td className="px-6 py-5">
                     <div className="flex items-center justify-center gap-3">
-                      <button className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition">
+                      <button
+                        className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
+                        onClick={() => {
+                          setEditId(item._id);
+
+                          setFormData({
+                            publicationImage: "",
+                            title: item.title || "",
+                            description: item.description || "",
+                            pdf: null,
+                          });
+
+                          setShowModal(true);
+                        }}
+                      >
                         <Pencil size={18} />
                       </button>
 
-                      <button className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition">
+                      <button
+                        className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
+                        onClick={() => setDeleteId(item._id)}
+                      >
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -198,8 +310,8 @@ export default function Publications() {
         </div>
 
         {/* MOBILE CARDS */}
-        <div className="grid grid-cols-1 gap-4 p-4 lg:hidden">
-          {publications.map((item, index) => (
+        <div className="grid grid-cols-1 gap-4 p-4 md:hidden">
+          {filteredPublications.map((item, index) => (
             <div
               key={index}
               className="border border-gray-100 rounded-3xl overflow-hidden shadow-sm"
@@ -221,11 +333,7 @@ export default function Publications() {
 
                 {/* PDF BUTTON */}
                 <a
-                  href={
-                    typeof item.pdf === "string"
-                      ? item.pdf
-                      : URL.createObjectURL(item.pdf)
-                  }
+                  href={item.pdf}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-5 inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#0d9488]/10 text-[#0d9488] hover:bg-[#0d9488] hover:text-white transition"
@@ -236,11 +344,28 @@ export default function Publications() {
 
                 {/* ACTIONS */}
                 <div className="flex items-center justify-end gap-3 mt-5">
-                  <button className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition">
+                  <button
+                    className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
+                    onClick={() => {
+                      setEditId(item._id);
+
+                      setFormData({
+                        publicationImage: "",
+                        title: item.title || "",
+                        description: item.description || "",
+                        pdf: null,
+                      });
+
+                      setShowModal(true);
+                    }}
+                  >
                     <Pencil size={18} />
                   </button>
 
-                  <button className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition">
+                  <button
+                    className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
+                    onClick={() => setDeleteId(item._id)}
+                  >
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -248,16 +373,23 @@ export default function Publications() {
             </div>
           ))}
         </div>
+        {filteredPublications.length === 0 && (
+          <div className="p-6 text-center text-gray-500">
+            No publications found
+          </div>
+        )}
       </div>
 
       {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-3xl rounded-[32px] shadow-2xl overflow-hidden">
+          <div className="bg-white w-full max-w-3xl rounded-[32px] shadow-2xl overflow-hidden max-h-[95vh] overflow-y-auto">
             {/* MODAL HEADER */}
             <div className="bg-gradient-to-r from-[#0d9488] to-[#0b7f75] px-8 py-6 text-white flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold">Add Publication</h2>
+                <h2 className="text-2xl font-bold">
+                  {editId ? "Edit Publication" : "Add Publication"}
+                </h2>
 
                 <p className="text-white/80 text-sm mt-1">
                   Upload publication details and PDF file
@@ -265,7 +397,18 @@ export default function Publications() {
               </div>
 
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+
+                  setEditId(null);
+
+                  setFormData({
+                    publicationImage: "",
+                    title: "",
+                    description: "",
+                    pdf: null,
+                  });
+                }}
                 className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
               >
                 <X size={20} />
@@ -274,7 +417,7 @@ export default function Publications() {
 
             {/* FORM */}
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              {/* IMAGE */}
+              {/* Image */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Publication Image URL
@@ -284,13 +427,17 @@ export default function Publications() {
                   <Image size={18} className="text-[#0d9488]" />
 
                   <input
-                    type="text"
+                    type="file"
                     name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    placeholder="Paste image URL"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        publicationImage: e.target.files[0],
+                      })
+                    }
                     className="ml-3 w-full outline-none"
-                    required
+                    required={!editId}
                   />
                 </div>
               </div>
@@ -359,7 +506,7 @@ export default function Publications() {
                       })
                     }
                     className="hidden"
-                    required
+                    required={!editId}
                   />
                 </label>
 
@@ -379,7 +526,18 @@ export default function Publications() {
               <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    setShowModal(false);
+
+                    setEditId(null);
+
+                    setFormData({
+                      publicationImage: "",
+                      title: "",
+                      description: "",
+                      pdf: null,
+                    });
+                  }}
                   className="px-6 py-3 rounded-2xl border border-gray-200 hover:bg-gray-100 transition font-medium"
                 >
                   Cancel
@@ -389,10 +547,71 @@ export default function Publications() {
                   type="submit"
                   className="bg-[#0d9488] hover:bg-[#0b7f75] text-white px-8 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
                 >
-                  Save Publication
+                  {loading
+                    ? "Processing..."
+                    : editId
+                    ? "Update Publication"
+                    : "Save Publication"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteId && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-[28px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            {/* HEADER */}
+            <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-5 text-white flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">Delete Partner</h2>
+
+                <p className="text-white/80 text-sm mt-1">
+                  This action cannot be undone
+                </p>
+              </div>
+
+              <button
+                onClick={() => setDeleteId(null)}
+                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* BODY */}
+            <div className="p-6">
+              <div className="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 size={34} className="text-red-500" />
+              </div>
+
+              <h3 className="text-xl font-bold text-center text-gray-800 mt-5">
+                Are you sure?
+              </h3>
+
+              <p className="text-gray-500 text-center mt-2 leading-relaxed">
+                Do you really want to delete this partner? This process cannot
+                be undone.
+              </p>
+
+              {/* BUTTONS */}
+              <div className="flex gap-4 mt-8">
+                <button
+                  onClick={() => setDeleteId(null)}
+                  className="flex-1 py-3 rounded-2xl border border-gray-200 hover:bg-gray-100 transition font-medium"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 py-3 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  {deleteLoading ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

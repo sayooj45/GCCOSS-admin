@@ -27,8 +27,8 @@ const Login = () => {
         password,
       });
 
-      console.log(res.data);
-
+      // console.log(res.data);
+      localStorage.setItem("token", res.data.token);
       navigate("/partners");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");

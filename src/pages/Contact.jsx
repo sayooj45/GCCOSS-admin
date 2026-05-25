@@ -1,27 +1,23 @@
 import { Search, Mail, Phone, User } from "lucide-react";
 
+import { useAdmin } from "../context/AdminContext";
+import { useState } from "react";
+
 export default function ContactSubmissions() {
-  const submissions = [
-    {
-      name: "John Doe",
-      mobile: "+91 9876543210",
-      email: "john@example.com",
-      message:
-        "I would like to know more about your partnership opportunities.",
-    },
-    {
-      name: "Sarah Wilson",
-      mobile: "+91 9123456780",
-      email: "sarah@example.com",
-      message: "Please share the event details and registration process.",
-    },
-    {
-      name: "Michael James",
-      mobile: "+91 9988776655",
-      email: "michael@example.com",
-      message: "Interested in collaborating with your organization.",
-    },
-  ];
+  const { submissions } = useAdmin();
+  const [searchTerm, setSearchTerm] = useState("");
+  console.log("submission", submissions);
+
+  const filteredSubmissions = submissions.filter((item) => {
+    const search = searchTerm.toLowerCase();
+
+    return (
+      item?.name?.toLowerCase().includes(search) ||
+      item?.email?.toLowerCase().includes(search) ||
+      item?.mobile?.toLowerCase().includes(search) ||
+      item?.message?.toLowerCase().includes(search)
+    );
+  });
 
   return (
     <div className="w-full max-w-full overflow-hidden">
@@ -44,6 +40,8 @@ export default function ContactSubmissions() {
           <input
             type="text"
             placeholder="Search submissions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="ml-3 w-full outline-none bg-transparent text-sm"
           />
         </div>
@@ -57,7 +55,7 @@ export default function ContactSubmissions() {
             <h2 className="text-xl font-bold text-gray-800">Submission List</h2>
 
             <p className="text-sm text-gray-500 mt-1">
-              Total Submissions: {submissions.length}
+              Total Submissions: {filteredSubmissions.length}
             </p>
           </div>
         </div>
@@ -86,7 +84,7 @@ export default function ContactSubmissions() {
             </thead>
 
             <tbody>
-              {submissions.map((item, index) => (
+              {filteredSubmissions.map((item, index) => (
                 <tr
                   key={index}
                   className="border-b border-gray-100 hover:bg-gray-50 transition"
@@ -138,7 +136,7 @@ export default function ContactSubmissions() {
 
         {/* MOBILE CARDS */}
         <div className="grid grid-cols-1 gap-4 p-4 md:hidden">
-          {submissions.map((item, index) => (
+          {filteredSubmissions.map((item, index) => (
             <div
               key={index}
               className="border border-gray-100 rounded-3xl p-5 shadow-sm"
@@ -177,6 +175,11 @@ export default function ContactSubmissions() {
             </div>
           ))}
         </div>
+        {filteredSubmissions.length === 0 && (
+          <div className="p-10 text-center text-gray-500">
+            No submissions found
+          </div>
+        )}
       </div>
     </div>
   );

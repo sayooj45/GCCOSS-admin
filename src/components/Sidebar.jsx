@@ -7,6 +7,7 @@ import {
   Bell,
   ShieldCheck,
   ChevronRight,
+  X,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -44,27 +45,61 @@ const menus = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   return (
-    <aside className="hidden lg:flex flex-col w-[300px] min-h-screen bg-gradient-to-b from-[#0d9488] via-[#0b7f75] to-[#0f172a] text-white relative overflow-hidden">
+    <aside
+      className={`
+    fixed lg:static top-0 left-0 z-50
+    flex flex-col w-[300px] min-h-screen
+    bg-gradient-to-b from-[#0d9488] via-[#0b7f75] to-[#0f172a]
+    text-white overflow-hidden
+    transform transition-transform duration-300 ease-in-out
+    ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+  `}
+    >
+      {" "}
       {/* BACKGROUND EFFECT */}
       <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
-
       {/* TOP LOGO SECTION */}
-      <div className="relative z-10 px-7 pt-8 pb-10 border-b border-white/10">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10 shadow-lg">
-            <ShieldCheck size={30} className="text-white" />
+      <div className="relative z-10 px-6 py-6 border-b border-white/10">
+        <div className="flex items-start justify-between gap-4">
+          {/* LEFT SIDE */}
+          <div className="flex items-center gap-4">
+            {/* LOGO ICON */}
+            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10 shadow-lg shrink-0">
+              <ShieldCheck size={30} className="text-white" />
+            </div>
+
+            {/* TEXT */}
+            <div>
+              <h1 className="text-2xl font-bold tracking-wide text-white leading-tight">
+                Admin Panel
+              </h1>
+
+              <p className="text-sm text-white/70 mt-1">Management Dashboard</p>
+            </div>
           </div>
 
-          <div>
-            <h1 className="text-2xl font-bold tracking-wide">Admin Panel</h1>
-
-            <p className="text-sm text-white/70 mt-1">Management Dashboard</p>
-          </div>
+          {/* MOBILE CLOSE BUTTON */}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="
+        lg:hidden
+        w-10 h-10
+        flex items-center justify-center
+        rounded-xl
+        bg-white/10
+        hover:bg-white/20
+        border border-white/10
+        backdrop-blur-md
+        transition-all duration-300
+        shrink-0
+      "
+          >
+            <X size={20} className="text-white" />
+          </button>
         </div>
       </div>
-
       {/* NAVIGATION */}
       <div className="relative z-10 flex-1 px-5 py-8">
         <p className="text-xs uppercase tracking-[0.25em] text-white/50 mb-5 px-4">
@@ -76,6 +111,7 @@ export default function Sidebar() {
             <NavLink
               key={index}
               to={menu.path}
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `group flex items-center justify-between px-4 py-4 rounded-2xl transition-all duration-300 ${
                   isActive
@@ -102,7 +138,6 @@ export default function Sidebar() {
           ))}
         </nav>
       </div>
-
       {/* BOTTOM PROFILE CARD */}
       {/* <div className="relative z-10 p-5">
         <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-3xl p-4 flex items-center gap-4 shadow-xl">

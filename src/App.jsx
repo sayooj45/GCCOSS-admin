@@ -9,12 +9,21 @@ import Events from "./pages/Events";
 import Publications from "./pages/Publications";
 import Notification from "./pages/Notification";
 import Contact from "./pages/Contact";
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route element={<AdminLayout />}>
+
+        <Route
+          element={
+            <ProtectedRoute>
+              {" "}
+              <AdminLayout />{" "}
+            </ProtectedRoute>
+          }
+        >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/partners" element={<Partners />} />
           <Route path="/contact-submissions" element={<Contact />} />
