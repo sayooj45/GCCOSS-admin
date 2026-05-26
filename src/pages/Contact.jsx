@@ -61,77 +61,79 @@ export default function ContactSubmissions() {
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="overflow-x-auto hidden md:block">
-          <table className="w-full">
-            <thead className="bg-[#0d9488]/5">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Name
-                </th>
+        <div className=" hidden md:block">
+          <div className="overflow-auto max-h-[600px]">
+            <table className="w-full">
+              <thead className="bg-[#0d9488]/5">
+                <tr>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Name
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Mobile Number
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Mobile Number
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Email
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Email
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Message
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredSubmissions.map((item, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition"
-                >
-                  {/* NAME */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 flex items-center justify-center">
-                        <User size={18} className="text-[#0d9488]" />
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-gray-800">
-                          {item.name}
-                        </h3>
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* MOBILE */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Phone size={16} />
-
-                      <span>{item.mobile}</span>
-                    </div>
-                  </td>
-
-                  {/* EMAIL */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Mail size={16} />
-
-                      <span>{item.email}</span>
-                    </div>
-                  </td>
-
-                  {/* MESSAGE */}
-                  <td className="px-6 py-5">
-                    <p className="text-gray-500 text-sm leading-relaxed max-w-md">
-                      {item.message}
-                    </p>
-                  </td>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Message
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {filteredSubmissions.map((item, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition"
+                  >
+                    {/* NAME */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 flex items-center justify-center">
+                          <User size={18} className="text-[#0d9488]" />
+                        </div>
+
+                        <div>
+                          <h3 className="font-semibold text-gray-800">
+                            {item.name}
+                          </h3>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* MOBILE */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Phone size={16} />
+
+                        <span>{item.mobile}</span>
+                      </div>
+                    </td>
+
+                    {/* EMAIL */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Mail size={16} />
+
+                        <span>{item.email}</span>
+                      </div>
+                    </td>
+
+                    {/* MESSAGE */}
+                    <td className="px-6 py-5">
+                      <p className="text-gray-500 text-sm leading-relaxed max-w-md">
+                        {item.message}
+                      </p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* MOBILE CARDS */}
