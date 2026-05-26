@@ -197,127 +197,129 @@ export default function Events() {
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="overflow-x-auto hidden md:block">
-          <table className="w-full ">
-            <thead className="bg-[#0d9488]/5">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Image
-                </th>
+        <div className=" hidden md:block">
+          <div className="overflow-auto max-h-[600px]">
+            <table className="w-full ">
+              <thead className="bg-[#0d9488]/5">
+                <tr>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Image
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Date
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Date
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Place
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Place
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Title
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Title
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Short Description
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Short Description
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Long Description
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Long Description
+                  </th>
 
-                <th className="text-center px-6 py-4 text-sm font-semibold text-gray-700">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredEvents.map((event, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition"
-                >
-                  {/* IMAGE */}
-                  <td className="px-6 py-5">
-                    <img
-                      src={event.image}
-                      alt={event.title}
-                      className="w-24 h-16 rounded-2xl object-cover border"
-                    />
-                  </td>
-
-                  {/* DATE */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <CalendarDays size={16} />
-                      {event.date}
-                    </div>
-                  </td>
-
-                  {/* PLACE */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin size={16} />
-                      {event.place}
-                    </div>
-                  </td>
-
-                  {/* TITLE */}
-                  <td className="px-6 py-5">
-                    <h3 className="font-semibold text-gray-800">
-                      {event.title}
-                    </h3>
-                  </td>
-
-                  {/* SHORT DESC */}
-                  <td className="px-6 py-5">
-                    <p className="text-sm text-gray-500 max-w-xs">
-                      {event.shortDescription}
-                    </p>
-                  </td>
-
-                  {/* LONG DESC */}
-                  <td className="px-6 py-5">
-                    <p className="text-sm text-gray-500 max-w-md">
-                      {event.longDescription}
-                    </p>
-                  </td>
-
-                  {/* ACTIONS */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center justify-center gap-3">
-                      <button
-                        className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
-                        onClick={() => {
-                          setEditId(event._id);
-
-                          setFormData({
-                            image: "",
-                            date: event.date || "",
-                            place: event.place || "",
-                            title: event.title || "",
-                            shortDescription: event.shortDescription || "",
-                            longDescription: event.longDescription || "",
-                          });
-
-                          setShowModal(true);
-                        }}
-                      >
-                        <Pencil size={18} />
-                      </button>
-
-                      <button
-                        className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
-                        onClick={() => setDeleteId(event._id)}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
+                  <th className="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {filteredEvents.map((event, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition"
+                  >
+                    {/* IMAGE */}
+                    <td className="px-6 py-5">
+                      <img
+                        src={event.image}
+                        alt={event.title}
+                        className="w-24 h-16 rounded-2xl object-cover border"
+                      />
+                    </td>
+
+                    {/* DATE */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <CalendarDays size={16} />
+                        {event.date}
+                      </div>
+                    </td>
+
+                    {/* PLACE */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <MapPin size={16} />
+                        {event.place}
+                      </div>
+                    </td>
+
+                    {/* TITLE */}
+                    <td className="px-6 py-5">
+                      <h3 className="font-semibold text-gray-800">
+                        {event.title}
+                      </h3>
+                    </td>
+
+                    {/* SHORT DESC */}
+                    <td className="px-6 py-5">
+                      <p className="text-sm text-gray-500 max-w-xs">
+                        {event.shortDescription}
+                      </p>
+                    </td>
+
+                    {/* LONG DESC */}
+                    <td className="px-6 py-5">
+                      <p className="text-sm text-gray-500 max-w-md">
+                        {event.longDescription}
+                      </p>
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
+                          onClick={() => {
+                            setEditId(event._id);
+
+                            setFormData({
+                              image: "",
+                              date: event.date || "",
+                              place: event.place || "",
+                              title: event.title || "",
+                              shortDescription: event.shortDescription || "",
+                              longDescription: event.longDescription || "",
+                            });
+
+                            setShowModal(true);
+                          }}
+                        >
+                          <Pencil size={18} />
+                        </button>
+
+                        <button
+                          className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
+                          onClick={() => setDeleteId(event._id)}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* MOBILE CARDS */}

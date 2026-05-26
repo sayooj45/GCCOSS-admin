@@ -65,7 +65,7 @@ export default function Publications() {
 
       if (editId) {
         const res = await axios.patch(
-          `${API_URL}/api/publications/update/${editId}`,
+          `${API_URL}/api/publications/patch/${editId}`,
           data,
           {
             headers: {
@@ -206,107 +206,109 @@ export default function Publications() {
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="overflow-x-auto hidden md:block">
-          <table className="w-full ">
-            <thead className="bg-[#0d9488]/5">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Image
-                </th>
+        <div className=" hidden md:block">
+          <div className="overflow-auto max-h-[600px]">
+            <table className="w-full ">
+              <thead className="bg-[#0d9488]/5">
+                <tr>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Image
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Title
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Title
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  Description
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Description
+                  </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                  PDF
-                </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    PDF
+                  </th>
 
-                <th className="text-center px-6 py-4 text-sm font-semibold text-gray-700">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredPublications.map((item, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition"
-                >
-                  {/* IMAGE */}
-                  <td className="px-6 py-5">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-24 h-16 rounded-2xl object-cover border"
-                    />
-                  </td>
-
-                  {/* TITLE */}
-                  <td className="px-6 py-5">
-                    <h3 className="font-semibold text-gray-800">
-                      {item.title}
-                    </h3>
-                  </td>
-
-                  {/* DESCRIPTION */}
-                  <td className="px-6 py-5">
-                    <p className="text-sm text-gray-500 max-w-md">
-                      {item.description}
-                    </p>
-                  </td>
-
-                  {/* PDF */}
-                  <td className="px-6 py-5">
-                    <a
-                      href={item.pdf}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0d9488]/10 text-[#0d9488] hover:bg-[#0d9488] hover:text-white transition"
-                    >
-                      <Eye size={16} />
-                      View PDF
-                    </a>
-                  </td>
-
-                  {/* ACTIONS */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center justify-center gap-3">
-                      <button
-                        className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
-                        onClick={() => {
-                          setEditId(item._id);
-
-                          setFormData({
-                            publicationImage: "",
-                            title: item.title || "",
-                            description: item.description || "",
-                            pdf: null,
-                          });
-
-                          setShowModal(true);
-                        }}
-                      >
-                        <Pencil size={18} />
-                      </button>
-
-                      <button
-                        className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
-                        onClick={() => setDeleteId(item._id)}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
+                  <th className="text-center px-6 py-4 text-sm font-semibold text-gray-700">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {filteredPublications.map((item, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition"
+                  >
+                    {/* IMAGE */}
+                    <td className="px-6 py-5">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-24 h-16 rounded-2xl object-cover border"
+                      />
+                    </td>
+
+                    {/* TITLE */}
+                    <td className="px-6 py-5">
+                      <h3 className="font-semibold text-gray-800">
+                        {item.title}
+                      </h3>
+                    </td>
+
+                    {/* DESCRIPTION */}
+                    <td className="px-6 py-5">
+                      <p className="text-sm text-gray-500 max-w-md">
+                        {item.description}
+                      </p>
+                    </td>
+
+                    {/* PDF */}
+                    <td className="px-6 py-5">
+                      <a
+                        href={item.pdf}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0d9488]/10 text-[#0d9488] hover:bg-[#0d9488] hover:text-white transition"
+                      >
+                        <Eye size={16} />
+                        View PDF
+                      </a>
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
+                          onClick={() => {
+                            setEditId(item._id);
+
+                            setFormData({
+                              publicationImage: "",
+                              title: item.title || "",
+                              description: item.description || "",
+                              pdf: null,
+                            });
+
+                            setShowModal(true);
+                          }}
+                        >
+                          <Pencil size={18} />
+                        </button>
+
+                        <button
+                          className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
+                          onClick={() => setDeleteId(item._id)}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* MOBILE CARDS */}
