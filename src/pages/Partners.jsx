@@ -167,89 +167,91 @@ export default function Partners() {
 
         {/* TABLE */}
 
-        <div className="overflow-x-auto hidden md:block">
-          <table className="w-full">
-            <thead className="bg-[#0d9488]/5">
-              <tr>
-                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
-                  Partner
-                </th>
+        <div className=" hidden md:block">
+          <div className="overflow-auto max-h-[600px]">
+            <table className="w-full">
+              <thead className="bg-[#0d9488]/5">
+                <tr>
+                  <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
+                    Partner
+                  </th>
 
-                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
-                  Title
-                </th>
+                  <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
+                    Title
+                  </th>
 
-                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
-                  Description
-                </th>
+                  <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
+                    Description
+                  </th>
 
-                <th className="text-center px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredPartners.map((partner, index) => (
-                <tr
-                  key={index}
-                  className="hidden md:table-row border-b border-gray-100 hover:bg-gray-50 transition"
-                >
-                  {/* DESKTOP TABLE ROW */}
-
-                  <td className="px-4 sm:px-6 py-5">
-                    <div className="w-14 h-14 rounded-2xl bg-gray-100 border overflow-hidden">
-                      <img
-                        src={partner.logo}
-                        alt={partner.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </td>
-
-                  <td className="px-4 sm:px-6 py-5">
-                    <h3 className="font-semibold text-gray-800">
-                      {partner.title}
-                    </h3>
-                  </td>
-
-                  <td className="px-4 sm:px-6 py-5">
-                    <p className="text-gray-500 text-sm leading-relaxed max-w-md">
-                      {partner.description}
-                    </p>
-                  </td>
-
-                  <td className="px-4 sm:px-6 py-5">
-                    <div className="flex items-center justify-center gap-3">
-                      <button
-                        onClick={() => {
-                          setEditId(partner._id);
-
-                          setFormData({
-                            logo: "",
-                            title: partner.title,
-                            description: partner.description,
-                          });
-
-                          setShowModal(true);
-                        }}
-                        className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
-                      >
-                        <Pencil size={18} />
-                      </button>
-
-                      <button
-                        onClick={() => setDeleteId(partner._id)}
-                        className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
+                  <th className="text-center px-4 sm:px-6 py-4 text-sm font-semibold text-gray-700">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {filteredPartners.map((partner, index) => (
+                  <tr
+                    key={index}
+                    className="hidden md:table-row border-b border-gray-100 hover:bg-gray-50 transition"
+                  >
+                    {/* DESKTOP TABLE ROW */}
+
+                    <td className="px-4 sm:px-6 py-5">
+                      <div className="w-14 h-14 rounded-2xl bg-gray-100 border overflow-hidden">
+                        <img
+                          src={partner.logo}
+                          alt={partner.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </td>
+
+                    <td className="px-4 sm:px-6 py-5">
+                      <h3 className="font-semibold text-gray-800">
+                        {partner.title}
+                      </h3>
+                    </td>
+
+                    <td className="px-4 sm:px-6 py-5">
+                      <p className="text-gray-500 text-sm leading-relaxed max-w-md">
+                        {partner.description}
+                      </p>
+                    </td>
+
+                    <td className="px-4 sm:px-6 py-5">
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={() => {
+                            setEditId(partner._id);
+
+                            setFormData({
+                              logo: "",
+                              title: partner.title,
+                              description: partner.description,
+                            });
+
+                            setShowModal(true);
+                          }}
+                          className="w-10 h-10 rounded-xl bg-[#0d9488]/10 hover:bg-[#0d9488] hover:text-white text-[#0d9488] flex items-center justify-center transition"
+                        >
+                          <Pencil size={18} />
+                        </button>
+
+                        <button
+                          onClick={() => setDeleteId(partner._id)}
+                          className="w-10 h-10 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {/* MOBILE CARDS */}
         <div className="grid grid-cols-1 gap-4 p-4 md:hidden">
