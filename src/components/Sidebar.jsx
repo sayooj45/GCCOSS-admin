@@ -18,11 +18,11 @@ const menus = [
     icon: Handshake,
     path: "/partners",
   },
-  {
-    name: "Enquiries",
-    icon: Mail,
-    path: "/contact-submissions",
-  },
+  // {
+  //   name: "Enquiries",
+  //   icon: Mail,
+  //   path: "/contact-submissions",
+  // },
   {
     name: "Events",
     icon: CalendarDays,

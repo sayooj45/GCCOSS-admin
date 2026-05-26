@@ -1,4 +1,4 @@
-import { ShieldCheck, Mail, Lock, Loader2 } from "lucide-react";
+import { ShieldCheck, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
@@ -13,6 +13,8 @@ const Login = () => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmitHandle = async (e) => {
     e.preventDefault();
@@ -95,13 +97,25 @@ const Login = () => {
               <Lock className="w-5 h-5 text-[#0d9488]" />
 
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter password"
                 className="w-full ml-3 bg-transparent outline-none text-gray-700 placeholder-gray-400"
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
                 required
               />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-gray-500 hover:text-[#0d9488] transition"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 
