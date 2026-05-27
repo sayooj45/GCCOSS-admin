@@ -54,6 +54,8 @@ export default function Events() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (loading) return;
+
     setloading(true);
 
     const data = new FormData();
@@ -545,6 +547,7 @@ export default function Events() {
 
                 <button
                   type="submit"
+                  disabled={loading}
                   className="bg-[#0d9488] hover:bg-[#0b7f75] text-white px-8 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
                 >
                   {loading
