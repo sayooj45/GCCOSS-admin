@@ -10,7 +10,7 @@ export default function Partners() {
   const [loading, setloading] = useState(false);
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-
+  const [imageError, setImageError] = useState("");
   const API_URL = import.meta.env.VITE_API_URL;
 
   const [formData, setFormData] = useState({
@@ -363,17 +363,33 @@ export default function Partners() {
                   <input
                     type="file"
                     name="logo"
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+
+                      if (!file) return;
+
+                      // IMAGE SIZE VALIDATION
+                      if (file.size > 5 * 1024 * 1024) {
+                        setImageError("Image size must be less than 5MB");
+                        e.target.value = "";
+                        return;
+                      }
+
+                      setImageError("");
+
                       setFormData({
                         ...formData,
-                        logo: e.target.files[0],
-                      })
-                    }
+                        image: file,
+                      });
+                    }}
                     placeholder="Logo image"
                     className="ml-3 w-full outline-none bg-transparent"
                     required={!editId}
                   />
                 </div>
+                {imageError && (
+                  <p className="text-red-500 text-sm mt-2">{imageError}</p>
+                )}
               </div>
 
               {/* TITLE */}

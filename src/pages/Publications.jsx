@@ -23,6 +23,7 @@ export default function Publications() {
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   const filteredPublications = publications.filter(
     (publication) =>
@@ -434,16 +435,32 @@ export default function Publications() {
                     type="file"
                     name="image"
                     accept="image/*"
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+
+                      if (!file) return;
+
+                      // IMAGE SIZE VALIDATION
+                      if (file.size > 5 * 1024 * 1024) {
+                        setImageError("Image size must be less than 5MB");
+                        e.target.value = "";
+                        return;
+                      }
+
+                      setImageError("");
+
                       setFormData({
                         ...formData,
-                        publicationImage: e.target.files[0],
-                      })
-                    }
+                        image: file,
+                      });
+                    }}
                     className="ml-3 w-full outline-none"
                     required={!editId}
                   />
                 </div>
+                {imageError && (
+                  <p className="text-red-500 text-sm mt-2">{imageError}</p>
+                )}
               </div>
 
               {/* TITLE */}

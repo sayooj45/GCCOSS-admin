@@ -22,6 +22,7 @@ export default function Events() {
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [imageError, setImageError] = useState("");
   console.log("events", events);
 
   const filteredEvents = events.filter(
@@ -438,16 +439,32 @@ export default function Events() {
                   <input
                     type="file"
                     name="image"
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+
+                      if (!file) return;
+
+                      // IMAGE SIZE VALIDATION
+                      if (file.size > 5 * 1024 * 1024) {
+                        setImageError("Image size must be less than 5MB");
+                        e.target.value = "";
+                        return;
+                      }
+
+                      setImageError("");
+
                       setFormData({
                         ...formData,
-                        image: e.target.files[0],
-                      })
-                    }
+                        image: file,
+                      });
+                    }}
                     className="ml-3 w-full outline-none"
                     required={!editId}
                   />
                 </div>
+                {imageError && (
+                  <p className="text-red-500 text-sm mt-2">{imageError}</p>
+                )}
               </div>
 
               {/* DATE + PLACE */}
